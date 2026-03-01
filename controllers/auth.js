@@ -14,7 +14,7 @@ const sendTokenResponse = (user, statusCode, res) => {
 //@route  POST /api/v1/auth/register
 exports.register = async (req, res, next) => {
   try {
-    const { name, email, password, role, tel, customer_ampur, customer_province, customer_zipcode } = req.body;
+    const { name, email, password, role, tel} = req.body;
 
     const user = await User.create({
       name,
@@ -51,4 +51,14 @@ exports.login = async (req, res, next) => {
 exports.logout = async (req, res, next) => {
   res.cookie('token', 'none', { expires: new Date(Date.now() + 10 * 1000), httpOnly: true });
   res.status(200).json({ success: true, data: {} });
+};
+
+exports.getMe = async (req, res, next) => {
+  
+  const user = await User.findById(req.user.id);
+  
+  res.status(200).json({
+    success: true,
+    data: user
+  });
 };
