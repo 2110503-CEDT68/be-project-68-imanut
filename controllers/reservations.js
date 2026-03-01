@@ -1,4 +1,5 @@
 const Reservation = require('../models/Reservation');
+const Restaurant = require('../models/Restaurant');
 
 //@desc   Get all reservations
 //@route  GET /api/v1/reservations
@@ -23,6 +24,45 @@ exports.getReservations = async (req, res, next) => {
     res.status(200).json({ success: true, count: reservations.length, data: reservations });
   } catch (err) {
     res.status(500).json({ success: false, message: "Cannot find Reservation" });
+  }
+};
+
+const Reservation = require('../models/Reservation');
+
+//@desc   Get single reservation
+//@route  GET /api/v1/reservations/:id
+//@access Private
+exports.getReservation = async (req, res, next) => {
+  try {
+    const reservation = await Reservation.findById(req.params.id).populate({
+      path: 'restaurant',
+      select: 'name address tel'
+    });
+
+    if (!reservation) {
+      return res.status(404).json({ 
+        success: false, 
+        message: `No reservation with the id of ${req.params.id}` 
+      });
+    }
+
+    if (reservation.user.toString() !== req.user.id && req.user.role !== 'admin') {
+      return res.status(401).json({ 
+        success: false, 
+        message: `User ${req.user.id} is not authorized to view this reservation` 
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: reservation
+    });
+  } catch (err) {
+    console.log(err.stack);
+    return res.status(500).json({ 
+      success: false, 
+      message: "Cannot find Reservation" 
+    });
   }
 };
 
