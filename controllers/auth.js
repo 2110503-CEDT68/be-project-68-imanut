@@ -21,10 +21,7 @@ exports.register = async (req, res, next) => {
       email,
       password,
       role : role || 'user',
-      tel,
-      customer_ampur,
-      customer_province,
-      customer_zipcode
+      tel
     });
 
     sendTokenResponse(user, 200, res);
