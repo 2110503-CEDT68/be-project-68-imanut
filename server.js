@@ -2,6 +2,10 @@ const express=require('express');
 const dotenv=require('dotenv');
 const cookieParser=require('cookie-parser');
 const connectDB=require('./config/db');
+const mongoSanitize=require('express-mongo-sanitize');
+const helmet=require('helmet');
+const {xss}=require('express-xss-sanitizer');
+const hpp=require('hpp');
 
 dotenv.config({path:'./config/config.env'});
 
@@ -12,6 +16,10 @@ const app=express();
 app.set('query parser','extended');
 app.use(express.json());
 app.use(cookieParser());
+app.use(mongoSanitize());
+app.use(helmet());
+app.use(xss());
+app.use(hpp());
 
 const restaurants=require('./routes/restaurants');
 const auth=require('./routes/auth');
