@@ -1,6 +1,6 @@
-const Restaurant = require('../models/restaurant');
+const Restaurant = require('../models/Restaurant');
 
-//@desc    Get all restaurants (Requirement #3 - Restaurant list)
+//@desc    Get all restaurants
 //@route   GET /api/v1/restaurants
 exports.getRestaurants = async (req, res, next) => {
   let query;
@@ -11,11 +11,11 @@ exports.getRestaurants = async (req, res, next) => {
   let queryStr = JSON.stringify(reqQuery).replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
   query = Restaurant.find(JSON.parse(queryStr)).populate('reservations');
 
-  // Select & Sort Logic
+  
   if (req.query.select) query = query.select(req.query.select.split(',').join(' '));
   query = req.query.sort ? query.sort(req.query.sort.split(',').join(' ')) : query.sort('-createdAt');
 
-  // Pagination
+  
   const page = parseInt(req.query.page, 10) || 1;
   const limit = parseInt(req.query.limit, 10) || 25;
   const skip = (page - 1) * limit;

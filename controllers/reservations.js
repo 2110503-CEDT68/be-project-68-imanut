@@ -1,19 +1,17 @@
-const Reservation = require('../models/reservation');
+const Reservation = require('../models/Reservation');
 
-//@desc   Get all reservations (Requirement #7)
+//@desc   Get all reservations
 //@route  GET /api/v1/reservations
 exports.getReservations = async (req, res, next) => {
   let query;
 
-  // Requirement #7: Admin ดูได้ทุกคน / User ดูได้เฉพาะของตนเอง
   if (req.user.role === 'admin') {
-    // Admin: หาการจองทั้งหมดในระบบ
+    
     query = Reservation.find().populate({
       path: 'restaurant',
       select: 'name address tel'
     });
   } else {
-    // User: หาเฉพาะที่ user field ตรงกับ ID ของผู้ล็อกอิน
     query = Reservation.find({ user: req.user.id }).populate({
       path: 'restaurant',
       select: 'name address tel'
@@ -28,14 +26,14 @@ exports.getReservations = async (req, res, next) => {
   }
 };
 
-//@desc   Update reservation (Requirement #8)
+//@desc   Update reservation
 //@route  PUT /api/v1/reservations/:id
 exports.updateReservation = async (req, res, next) => {
   try {
     let reservation = await Reservation.findById(req.params.id);
     if (!reservation) return res.status(404).json({ success: false, message: 'No reservation found' });
 
-    // Requirement #8: เช็คว่าเป็นเจ้าของ หรือว่าเป็น Admin
+    // เช็คว่าเป็นเจ้าของ หรือว่าเป็น Admin
     if (reservation.user.toString() !== req.user.id && req.user.role !== 'admin') {
       return res.status(401).json({ 
         success: false, 
@@ -54,14 +52,13 @@ exports.updateReservation = async (req, res, next) => {
   }
 };
 
-//@desc   Delete reservation (Requirement #9)
+//@desc   Delete reservation
 //@route  DELETE /api/v1/reservations/:id
 exports.deleteReservation = async (req, res, next) => {
   try {
     const reservation = await Reservation.findById(req.params.id);
     if (!reservation) return res.status(404).json({ success: false, message: 'No reservation found' });
 
-    // Requirement #9: เช็คว่าเป็นเจ้าของ หรือว่าเป็น Admin
     if (reservation.user.toString() !== req.user.id && req.user.role !== 'admin') {
       return res.status(401).json({ 
         success: false, 
@@ -81,13 +78,10 @@ exports.deleteReservation = async (req, res, next) => {
 //@access Private
 exports.addReservation = async (req, res, next) => {
   try {
-    // 1. นำ restaurantId จาก URL parameter มาใส่ใน body
     req.body.restaurant = req.params.restaurantId;
     
-    // 2. ผูก ID ของผู้ใช้งานที่ล็อกอินอยู่เข้ากับการจอง
     req.body.user = req.user.id;
 
-    // 3. ตรวจสอบว่าร้านอาหารที่ต้องการจองมีตัวตนจริงหรือไม่
     const restaurant = await Restaurant.findById(req.params.restaurantId);
     if (!restaurant) {
       return res.status(404).json({ 
@@ -96,11 +90,8 @@ exports.addReservation = async (req, res, next) => {
       });
     }
 
-    // 4. BUSINESS LOGIC: ตรวจสอบโควต้าการจอง (Requirement #3)
-    // ค้นหาการจองที่มีอยู่แล้วของ user คนนี้
     const existedReservations = await Reservation.find({ user: req.user.id });
 
-    // ถ้าจองครบ 3 ที่แล้ว และไม่ใช่ Admin จะไม่อนุญาตให้จองเพิ่ม
     if (existedReservations.length >= 3 && req.user.role !== 'admin') {
       return res.status(400).json({ 
         success: false, 
@@ -108,7 +99,6 @@ exports.addReservation = async (req, res, next) => {
       });
     }
 
-    // 5. บันทึกข้อมูลการจองลง Database
     const reservation = await Reservation.create(req.body);
 
     res.status(200).json({

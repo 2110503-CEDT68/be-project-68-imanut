@@ -1,4 +1,4 @@
-const User = require('../../models/User');
+const User = require('../models/User');
 
 // Helper สำหรับส่ง Token และเก็บใน Cookie
 const sendTokenResponse = (user, statusCode, res) => {
@@ -11,7 +11,6 @@ const sendTokenResponse = (user, statusCode, res) => {
   res.status(statusCode).cookie('token', token, options).json({ success: true, token });
 };
 
-//@desc   Register User (Requirement #1)
 //@route  POST /api/v1/auth/register
 exports.register = async (req, res, next) => {
   try {
@@ -22,7 +21,7 @@ exports.register = async (req, res, next) => {
       email,
       password,
       role : role || 'user',
-      tel, // เก็บเบอร์โทรศัพท์ตามโจทย์
+      tel,
       customer_ampur,
       customer_province,
       customer_zipcode
@@ -35,7 +34,6 @@ exports.register = async (req, res, next) => {
   }
 };
 
-//@desc   Login User (Requirement #2)
 //@route  POST /api/v1/auth/login
 exports.login = async (req, res, next) => {
   const { email, password } = req.body;
@@ -49,7 +47,6 @@ exports.login = async (req, res, next) => {
   sendTokenResponse(user, 200, res);
 };
 
-//@desc   Logout User (Requirement #2)
 //@route  GET /api/v1/auth/logout
 exports.logout = async (req, res, next) => {
   res.cookie('token', 'none', { expires: new Date(Date.now() + 10 * 1000), httpOnly: true });
