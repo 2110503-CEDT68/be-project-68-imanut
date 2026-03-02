@@ -15,8 +15,8 @@ const app=express();
 
 app.set('query parser','extended');
 app.use(express.json());
+//app.use(mongoSanitize());
 app.use(cookieParser());
-app.use(mongoSanitize());
 app.use(helmet());
 app.use(xss());
 app.use(hpp());
