@@ -27,8 +27,6 @@ exports.getReservations = async (req, res, next) => {
   }
 };
 
-const Reservation = require('../models/Reservation');
-
 //@desc   Get single reservation
 //@route  GET /api/v1/reservations/:id
 //@access Private

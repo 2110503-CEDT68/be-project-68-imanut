@@ -7,8 +7,12 @@ const {
     deleteRestaurant
 } = require('../controllers/restaurants');
 
+const reservationRouter = require('./reservations');
+
 const router = express.Router();
 const { protect, authorize } = require('../middleware/auth');
+
+router.use('/:restaurantId/reservations', reservationRouter);
 
 router.route('/')
     .get(getRestaurants) 
