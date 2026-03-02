@@ -53,4 +53,10 @@ RestaurantSchema.virtual('reservations',{
   justOne:false
 });
 
+RestaurantSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
+    console.log(`Reservations being removed from restaurant ${this._id}`);
+    await this.model('Reservation').deleteMany({ restaurant: this._id });
+    next();
+});
+
 module.exports=mongoose.model('Restaurant',RestaurantSchema);

@@ -85,17 +85,17 @@ exports.updateRestaurant = async (req, res, next) => {
 //@route   DELETE /api/v1/restaurants/:id
 //@access  Private
 exports.deleteRestaurant = async (req, res, next) => {
-  try {
-    if (req.user.role !== 'admin') {
-      return res.status(401).json({ success: false, message: 'Not authorized to delete restaurants' });
-    }
+    try {
+        const restaurant = await Restaurant.findById(req.params.id);
 
-    const restaurant = await Restaurant.findById(req.params.id);
-    if (!restaurant) return res.status(404).json({ success: false, message: 'Restaurant not found' });
-    
-    await restaurant.deleteOne();
-    res.status(200).json({ success: true, data: {} });
-  } catch (err) {
-    res.status(400).json({ success: false });
-  }
+        if (!restaurant) {
+            return res.status(404).json({ success: false, message: 'Restaurant not found' });
+        }
+
+        await restaurant.deleteOne();
+
+        res.status(200).json({ success: true, data: {} });
+    } catch (err) {
+        res.status(400).json({ success: false });
+    }
 };
